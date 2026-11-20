@@ -1,34 +1,54 @@
 plugins {
     id 'fabric-loom' version '1.9-SNAPSHOT'
+    id 'maven-publish'
 }
 
-version = project.mod_version
+version = '1.0.0'
 group = 'com.ezvisuals'
-base { archivesName = 'ezvisuals' }
+
+base {
+    archivesName = 'ezvisuals'
+}
 
 repositories {
     mavenCentral()
+    maven { url = 'https://fabricmc.net' }
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    minecraft "com.mojang:minecraft:1.21.4"
+    mappings "net.fabricmc:yarn:1.21.4+build.8:v2"
+    modImplementation "net.fabricmc:fabric-loader:0.16.10"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.115.0+1.21.4"
+}
 
-    // Lua scripting engine (bundled into the mod jar)
-    implementation "org.luaj:luaj-jse:3.0.1"
-    include "org.luaj:luaj-jse:3.0.1"
+sourceSets {
+    main {
+        java {
+            srcDirs = ['.']
+        }
+        resources {
+            srcDirs = ['.']
+            include 'fabric.mod.json', '*.mixins.json', 'assets/**'
+        }
+    }
 }
 
 processResources {
     inputs.property "version", project.version
-    filesMatching("fabric.mod.json") { expand "version": project.version }
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+jar {
+    from('.') {
+        include 'fabric.mod.json', '*.mixins.json'
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
     it.options.release = 21
-    it.options.encoding = 'UTF-8'
 }
 
 java {
